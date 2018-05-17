@@ -3,7 +3,7 @@ package com.stalker.dao;
 import javax.persistence.EntityManager;
 
 public class UserDao {
-	
+
 	public void createUser(final User user) {
 		final EntityManager entityManager = EntityManagerUtil.getEntityManager();
 		entityManager.getTransaction().begin();

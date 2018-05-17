@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.stalker.dao.Friend;
 import com.stalker.dao.Invitation;
@@ -38,7 +39,7 @@ public class UserController {
 	
 	@PUT
 	@Path("/{id}/position")
-	public void updateUserPosition(@PathParam("id") final String userId, final Position position) {
+	public Response updateUserPosition(@PathParam("id") final String userId, final Position position) {
 		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 	
@@ -56,7 +57,7 @@ public class UserController {
 	
 	@PUT
 	@Path("/{id}/invitation")
-	public void acceptInvitation(@PathParam("id") final String userId, final Invitation invitation) {
+	public Response acceptInvitation(@PathParam("id") final String userId, final Invitation invitation) {
 		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 	
@@ -74,7 +75,7 @@ public class UserController {
 	
 	@DELETE
 	@Path("/{id}/friends/{friendId}")
-	public void deleteFriend(@PathParam("id") final String userId, @PathParam("friendId") final String friendId) {
+	public Response deleteFriend(@PathParam("id") final String userId, @PathParam("friendId") final String friendId) {
 		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 	

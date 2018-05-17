@@ -1,5 +1,5 @@
 package com.stalker;
-import java.io.IOException;
+
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,13 +17,12 @@ public class App {
 		try {
 			final ResourceConfig resourceConfig = new ResourceConfig(UserController.class);
 			final HttpServer server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI, resourceConfig, false);
-			
+
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown()));
 			server.start();
 			Thread.currentThread().join();
-		} catch (IOException | InterruptedException ex) {
+		} catch (final Exception ex) {
 			Logger.getLogger(App.class.getName()).log(Level.SEVERE, "", ex);
 		}
-		
 	}
 }
