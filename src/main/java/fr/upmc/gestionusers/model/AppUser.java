@@ -23,7 +23,7 @@ public class AppUser {
 	private Integer id;
 	@Column
 	private String username;
-	@Column
+	@Column(name="first_name")
 	private String firstName;
 	@Column
 	private String lastname;
@@ -47,6 +47,17 @@ public class AppUser {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	
+	public AppUser() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public AppUser(String username, String password) {
+		this.username = username;
+		this.password = password;
 	}
 
 	public String getUsername() {

@@ -11,5 +11,8 @@ import fr.upmc.gestionusers.model.AppUser;
 public interface UserRepository  extends JpaRepository<AppUser, Integer> {
 	@Query("select u from AppUser u where u.username = ?1")
 	public List<AppUser> findUser(String username);
+	
+	
+	
 	AppUser findByUsername(String username);
 }

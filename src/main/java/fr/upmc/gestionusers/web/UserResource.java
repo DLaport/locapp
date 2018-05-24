@@ -15,51 +15,27 @@ import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import fr.upmc.gestionusers.model.AppUser;
 import fr.upmc.gestionusers.model.Position;
 import fr.upmc.gestionusers.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
-
-@Path("/users")
+@CrossOrigin(origins= {"http://localhost", "david.com"}, maxAge = 3600)
+@Path("/user")
 public class UserResource {
 	@Autowired
 	private UserRepository userRepository;
-	
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-		
-	@GET
-	@Path("/user")
-    @Produces("application/json")
-    public List<AppUser> getAllUsers() {
-		return userRepository.findAll();
-    }
-	
-	
-	@GET
-	@Path("/user/{search}")
-	@Produces("application/json")
-	public Response findUser(@PathParam("search") String username) throws URISyntaxException {
-		List<AppUser> users = userRepository.findUser(username);
-		if(users.isEmpty()) {
-            return Response.status(404).build();
-        }
-		return Response
-                .status(200)
-                .entity(users.get(0))
-                .contentLocation(new URI("/user-management/"+username)).build();
-	}
 
 	@POST
-	@Path("/user")
+	@Path("/register")
 	@Consumes("application/json")
 	public Response creatUser(AppUser user) throws URISyntaxException {
 		if(user.getFirstName() == null && "".equals(user.getFirstName())) {
 			return Response.status(400).entity("FirstName ne doit pas être null ou vide").build();	
 		}
-		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		AppUser verUser = userRepository.findByUsername(user.getUsername());
 		if(verUser != null)
 			throw new RuntimeException("This user already exists");
@@ -68,12 +44,36 @@ public class UserResource {
 	}
 	
 	@POST
-	@Path("/authentication")
+	@Path("/login")
 	@Consumes("application/json")
-	public Response signUp(AppUser user) throws URISyntaxException {
-		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		userRepository.save(user);
-		return Response.status(201).contentLocation(new URI(user.getUsername())).build();
+	public Response signUp(AppUser login) throws URISyntaxException {
+		
+		
+		String jwtToken = "";
+
+	    if (login.getUsername() == null || login.getPassword() == null) {
+	        throw new RuntimeException("Please fill in username and password");
+	    }
+
+	    String username = login.getUsername();
+	    String password = login.getPassword();
+
+	    AppUser user = userRepository.findByUsername(username);
+
+	    if (user == null) {
+	        throw new RuntimeException("User email not found.");
+	    }
+
+	    String pwd = user.getPassword();
+
+	    if (!password.equals(pwd)) {
+	        throw new RuntimeException("Invalid login. Please check your name and password.");
+	    }
+
+	    jwtToken = Jwts.builder().setSubject(username).claim("roles", "user").setIssuedAt(new Date())
+	            .signWith(SignatureAlgorithm.HS256, "secretkey").compact();
+
+	    return Response.status(201).header("authorization", "Bearer " + jwtToken).contentLocation(new URI(user.getUsername())).build();
 	}
 	
 	@POST
