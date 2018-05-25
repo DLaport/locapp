@@ -1,4 +1,4 @@
-package com.stalker.dao;
+package com.stalker.dao.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +18,7 @@ public class User {
 	private String firstName;
 	private String lastName;
 	private String email;
+	private String token;
 
 	@Id
 	@GeneratedValue(generator = "increment")
@@ -73,5 +74,13 @@ public class User {
 
 	public void setPassword(final String password) {
 		this.password = password;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(final String token) {
+		this.token = token;
 	}
 }

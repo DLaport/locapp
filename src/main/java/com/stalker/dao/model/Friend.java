@@ -1,4 +1,4 @@
-package com.stalker.dao;
+package com.stalker.dao.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

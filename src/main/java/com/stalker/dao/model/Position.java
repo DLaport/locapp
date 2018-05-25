@@ -1,4 +1,4 @@
-package com.stalker.dao;
+package com.stalker.dao.model;
 
 import java.util.Date;
 
