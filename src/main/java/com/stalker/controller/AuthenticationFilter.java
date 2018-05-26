@@ -1,9 +1,9 @@
-package com.stalker.controller.authentication;
+package com.stalker.controller;
 
-import java.io.IOException;
 import java.security.Principal;
 
 import javax.annotation.Priority;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -21,46 +21,37 @@ import com.stalker.dao.model.User;
 public class AuthenticationFilter
 implements ContainerRequestFilter {
 	private static final String AUTHENTICATION_SCHEME = "Bearer";
-	
+
 	@Override
 	public void filter(final ContainerRequestContext requestContext) {
 		final String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		
+
 		// Validate the authorization header
-		if (authorizationHeader == null || !authorizationHeader.toLowerCase().startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ")) {
-			abortWithUnauthorized(requestContext);
-			return;
+		if ((authorizationHeader == null) || !authorizationHeader.toLowerCase().startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ")) {
+			throw new NotAuthorizedException("Invalid authorization header.");
 		}
-		
+
 		// Extract the token
 		final String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
 
 		try {
 			// If the token is valid, get the user. Otherwise, throw an Exception.
 			final User user = validateToken(token);
-			
-			updateSecurityContext(requestContext, user);
-		} catch (final IOException e) {
-			requestContext.abortWith(Response.serverError().build()); // TODO: either add a message or don't close the dao
-		} catch (final Exception e) {
-			abortWithUnauthorized(requestContext);
-		}
-	}
 
-	private void abortWithUnauthorized(final ContainerRequestContext requestContext) {
-		try (
-		// Build unautorized response
-		final Response response = Response.status(Response.Status.UNAUTHORIZED)
-		.header(HttpHeaders.WWW_AUTHENTICATE, AUTHENTICATION_SCHEME).build();) {
-			
+			updateSecurityContext(requestContext, user);
+		} catch (final NotAuthorizedException e) {
+			final Response response = Response.status(Response.Status.UNAUTHORIZED)
+				.header(HttpHeaders.WWW_AUTHENTICATE, AUTHENTICATION_SCHEME).entity(e.getMessage()).build();
 			requestContext.abortWith(response);
 		}
 	}
 
 	private User validateToken(final String token)
-	throws Exception {
+	throws NotAuthorizedException {
 		try (final UserDao userDao = new UserDao();) {
-			return userDao.getUserByToken(token).orElseThrow(Exception::new);
+			return userDao.getUserByToken(token).orElseThrow(() -> {
+				return new NotAuthorizedException("Invalid token.");
+			});
 		}
 	}
 

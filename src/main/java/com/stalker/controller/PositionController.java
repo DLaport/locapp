@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.stalker.controller.authentication.Secured;
 import com.stalker.dao.model.Position;
 
 @Secured

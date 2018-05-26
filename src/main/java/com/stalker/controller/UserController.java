@@ -10,7 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import com.stalker.controller.authentication.Secured;
 import com.stalker.dao.UserDao;
 import com.stalker.dao.model.User;
 
@@ -26,7 +25,7 @@ public class UserController {
 		userDao.createUser(user);
 		return user; // TODO: return less info
 	}
-	
+
 	@GET
 	@Secured
 	@Path("/users")

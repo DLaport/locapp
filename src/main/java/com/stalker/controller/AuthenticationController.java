@@ -10,7 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.stalker.controller.authentication.Secured;
 import com.stalker.dao.UserDao;
 import com.stalker.dao.model.User;
 
@@ -18,7 +17,7 @@ import com.stalker.dao.model.User;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationController {
-	
+
 	@POST
 	public Response authenticateUser(final User credentials) {
 		try {
@@ -29,9 +28,6 @@ public class AuthenticationController {
 			}
 		} catch (final CredentialException e) {
 			return Response.status(Response.Status.FORBIDDEN).build();
-		} catch (final Exception e) {
-			e.printStackTrace();
-			return Response.serverError().build();
 		}
 	}
 

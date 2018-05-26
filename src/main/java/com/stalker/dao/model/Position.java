@@ -20,48 +20,48 @@ public class Position {
 	private double latitude;
 	private double longitude;
 	private Date lastUpdate;
-	
+
 	@Id
 	@GeneratedValue(generator = "increment")
 	@GenericGenerator(name = "increment", strategy = "increment")
 	public int getId() {
 		return id;
 	}
-	
+
 	public void setId(final int id) {
 		this.id = id;
 	}
-	
+
 	public int getUserId() {
 		return userId;
 	}
-	
+
 	public void setUserId(final int userId) {
 		this.userId = userId;
 	}
-	
+
 	public double getLatitude() {
 		return latitude;
 	}
-	
+
 	public void setLatitude(final double latitude) {
 		this.latitude = latitude;
 	}
-	
+
 	public double getLongitude() {
 		return longitude;
 	}
-	
+
 	public void setLongitude(final double longitude) {
 		this.longitude = longitude;
 	}
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "UPDATE_DATE")
 	public Date getLastUpdate() {
 		return lastUpdate;
 	}
-	
+
 	public void setLastUpdate(final Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}

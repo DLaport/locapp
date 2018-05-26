@@ -1,4 +1,4 @@
-package com.stalker.controller.authentication;
+package com.stalker.controller;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
