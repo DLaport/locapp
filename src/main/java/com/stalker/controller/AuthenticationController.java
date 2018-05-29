@@ -1,12 +1,12 @@
 package com.stalker.controller;
 
-import java.util.UUID;
-
 import javax.security.auth.login.CredentialException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -22,8 +22,7 @@ public class AuthenticationController {
 	public Response authenticateUser(final User credentials) {
 		try {
 			try (final UserDao dao = new UserDao();) {
-				dao.authenticateUser(credentials.getUsername(), credentials.getPassword());
-				final String token = UUID.randomUUID().toString();
+				final String token = dao.authenticateUser(credentials.getUsername(), credentials.getPassword());
 				return Response.ok(token).build();
 			}
 		} catch (final CredentialException e) {
@@ -34,7 +33,11 @@ public class AuthenticationController {
 	@POST
 	@Secured
 	@Path("/logout")
-	public void disconnectUser() {
-		throw new UnsupportedOperationException("Not yet implemented.");
+	public void disconnectUser(@Context final HttpHeaders httpHeaders) {
+		final String token = httpHeaders.getHeaderString(HttpHeaders.AUTHORIZATION)
+			.substring(AuthenticationFilter.AUTHENTICATION_SCHEME.length()).trim();
+		try (final UserDao dao = new UserDao();) {
+			dao.disconnectUser(token);
+		}
 	}
 }

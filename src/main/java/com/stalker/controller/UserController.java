@@ -17,19 +17,22 @@ import com.stalker.dao.model.User;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UserController {
-	private final UserDao userDao = new UserDao(); // TODO: close this
 
 	@POST
 	@Path("/user")
 	public User createUser(final User user) {
-		userDao.createUser(user);
-		return user; // TODO: return less info
+		try (UserDao userDao = new UserDao();) {
+			userDao.createUser(user);
+			return user;
+		}
 	}
 
 	@GET
 	@Secured
 	@Path("/users")
 	public List<User> getUsers(@QueryParam("search") final String searchText) {
-		return userDao.searchUsers(searchText);
+		try (UserDao userDao = new UserDao();) {
+			return userDao.searchUsers(searchText);
+		}
 	}
 }

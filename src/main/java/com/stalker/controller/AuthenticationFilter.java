@@ -9,6 +9,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
@@ -20,7 +21,7 @@ import com.stalker.dao.model.User;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter
 implements ContainerRequestFilter {
-	private static final String AUTHENTICATION_SCHEME = "Bearer";
+	public static final String AUTHENTICATION_SCHEME = "Bearer";
 
 	@Override
 	public void filter(final ContainerRequestContext requestContext) {
@@ -40,9 +41,10 @@ implements ContainerRequestFilter {
 
 			updateSecurityContext(requestContext, user);
 		} catch (final NotAuthorizedException e) {
-			final Response response = Response.status(Response.Status.UNAUTHORIZED)
-				.header(HttpHeaders.WWW_AUTHENTICATE, AUTHENTICATION_SCHEME).entity(e.getMessage()).build();
-			requestContext.abortWith(response);
+			final ResponseBuilder response = Response.status(Response.Status.UNAUTHORIZED)
+				.header(HttpHeaders.WWW_AUTHENTICATE, AUTHENTICATION_SCHEME)
+				.entity(e.getMessage());
+			requestContext.abortWith(response.build());
 		}
 	}
 
@@ -55,6 +57,7 @@ implements ContainerRequestFilter {
 		}
 	}
 
+	// TODO: check if we really need this
 	private void updateSecurityContext(final ContainerRequestContext requestContext, final User user) {
 		final SecurityContext securityContext = requestContext.getSecurityContext();
 		requestContext.setSecurityContext(new SecurityContext() {

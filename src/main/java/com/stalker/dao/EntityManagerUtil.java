@@ -19,4 +19,10 @@ public class EntityManagerUtil {
 	public static EntityManager getEntityManager() {
 		return entityManagerFactory.createEntityManager();
 	}
+
+	public static void executeInTransaction(final EntityManager entityManager, final Runnable function) {
+		entityManager.getTransaction().begin();
+		function.run();
+		entityManager.getTransaction().commit();
+	}
 }

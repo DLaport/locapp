@@ -3,6 +3,7 @@ package com.stalker.dao;
 import java.io.Closeable;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.security.auth.login.CredentialException;
@@ -18,9 +19,7 @@ implements Closeable {
 	}
 
 	public void createUser(final User user) {
-		entityManager.getTransaction().begin();
-		entityManager.persist(user);
-		entityManager.getTransaction().commit();
+		EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(user));
 	}
 
 	public Optional<User> getUserById(final int id) {
@@ -39,16 +38,25 @@ implements Closeable {
 		return users;
 	}
 
-	public void authenticateUser(final String username, final String password)
+	public String authenticateUser(final String username, final String password)
 	throws CredentialException {
 		final String sqlQuery = "from User where username=:username and password=:password";
-		final boolean credentialsValid = entityManager.createQuery(sqlQuery, User.class)
+		return entityManager.createQuery(sqlQuery, User.class)
 			.setParameter("username", username)
 			.setParameter("password", password)
-			.getResultList().size() > 0;
-		if (!credentialsValid) {
-			throw new CredentialException();
-		}
+			.getResultStream().findAny()
+			.map(user -> {
+				user.setToken(UUID.randomUUID().toString());
+				EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.merge(user));
+				return user.getToken();
+			}).orElseThrow(CredentialException::new);
+	}
+
+	public void disconnectUser(final String token) {
+		getUserByToken(token).ifPresent(user -> {
+			user.setToken(null);
+			EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.merge(user));
+		});
 	}
 
 	@Override
