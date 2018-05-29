@@ -6,17 +6,21 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "POSITION")
 public class Position {
 	private int id;
-	private int userId;
+	private User user;
 	private double latitude;
 	private double longitude;
 	private Date lastUpdate;
@@ -32,14 +36,17 @@ public class Position {
 		this.id = id;
 	}
 
-	public int getUserId() {
-		return userId;
+	@OneToOne
+	@JoinColumn(name = "USER_ID")
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(final int userId) {
-		this.userId = userId;
+	public void setUser(final User user) {
+		this.user = user;
 	}
 
+	@NotNull
 	public double getLatitude() {
 		return latitude;
 	}
@@ -48,6 +55,7 @@ public class Position {
 		this.latitude = latitude;
 	}
 
+	@NotNull
 	public double getLongitude() {
 		return longitude;
 	}
@@ -58,6 +66,7 @@ public class Position {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "UPDATE_DATE")
+	@UpdateTimestamp
 	public Date getLastUpdate() {
 		return lastUpdate;
 	}
