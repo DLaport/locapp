@@ -3,6 +3,8 @@ package com.stalker.dao.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -11,8 +13,8 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "INVITATION")
 public class Invitation {
 	private int id;
-	private int userid;
-	private int friendId;
+	private User userId;
+	private User friendId;
 
 	@Id
 	@GeneratedValue(generator = "increment")
@@ -25,19 +27,23 @@ public class Invitation {
 		this.id = id;
 	}
 
-	public int getUserid() {
-		return userid;
+	@ManyToOne
+	@JoinColumn(name = "USER_ID")
+	public User getUserId() {
+		return userId;
 	}
 
-	public void setUserid(final int userid) {
-		this.userid = userid;
+	public void setUserId(final User userid) {
+		userId = userid;
 	}
 
-	public int getFriendId() {
+	@ManyToOne
+	@JoinColumn(name = "FRIEND_ID")
+	public User getFriendId() {
 		return friendId;
 	}
 
-	public void setFriendId(final int friendId) {
+	public void setFriendId(final User friendId) {
 		this.friendId = friendId;
 	}
 }

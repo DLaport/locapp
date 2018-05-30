@@ -8,8 +8,6 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
@@ -29,30 +27,23 @@ implements ContainerRequestFilter {
 
 		// Validate the authorization header
 		if ((authorizationHeader == null) || !authorizationHeader.toLowerCase().startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ")) {
-			throw new NotAuthorizedException("Invalid authorization header.");
+			throw new NotAuthorizedException("Invalid authorization header.", AUTHENTICATION_SCHEME);
 		}
 
 		// Extract the token
 		final String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
 
-		try {
-			// If the token is valid, get the user. Otherwise, throw an Exception.
-			final User user = validateToken(token);
+		// If the token is valid, get the user. Otherwise, throw an Exception.
+		final User user = validateToken(token);
 
-			updateSecurityContext(requestContext, user);
-		} catch (final NotAuthorizedException e) {
-			final ResponseBuilder response = Response.status(Response.Status.UNAUTHORIZED)
-				.header(HttpHeaders.WWW_AUTHENTICATE, AUTHENTICATION_SCHEME)
-				.entity(e.getMessage());
-			requestContext.abortWith(response.build());
-		}
+		updateSecurityContext(requestContext, user);
 	}
 
 	private User validateToken(final String token)
 	throws NotAuthorizedException {
 		try (final UserDao userDao = new UserDao();) {
 			return userDao.getUserByToken(token).orElseThrow(() -> {
-				return new NotAuthorizedException("Invalid token.");
+				return new NotAuthorizedException("Invalid token.", AUTHENTICATION_SCHEME);
 			});
 		}
 	}
