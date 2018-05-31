@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import com.stalker.dao.model.Invitation;
 import com.stalker.dao.model.User;
@@ -18,23 +19,29 @@ implements Closeable {
 	}
 
 	public Optional<Invitation> createInvitation(final int userId, final int friendId) {
-		// Check if the invitation already exists.
-		final String sqlQuery = "from Invitation where userid=:userid and friendid=:friendid";
-		// TODO: check if the user is already in your friends list
-		final boolean exists = entityManager.createQuery(sqlQuery)
-			.setParameter("userid", userId).setParameter("friendid", friendId).getFirstResult() > 0;
-		if (!exists && (userId != friendId)) {
+		if ((userId != friendId)) {
 			final Invitation invitation = new Invitation();
 			invitation.setUserId(entityManager.find(User.class, userId));
 			invitation.setFriendId(entityManager.find(User.class, friendId));
-			EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(invitation));
-			return Optional.of(invitation);
+
+			// Check if they are already friends.
+			final String sql1 = "from Friend where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
+			final Query checkFriendsQuery = entityManager.createQuery(sql1).setParameter("userid", userId).setParameter("friendid", friendId);
+			// Check if they already invited each other.
+			final String sql2 = "from Invitation where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
+			final Query checkInvitationsQuery = entityManager.createQuery(sql2).setParameter("userid", userId).setParameter("friendid", friendId);
+
+			if ((checkFriendsQuery.getResultList().size() == 0) && (checkInvitationsQuery.getResultList().size() == 0)) {
+				// Only one row is added, because the "invitation" relation is always reciprocal.
+				EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(invitation));
+				return Optional.of(invitation);
+			}
 		}
 		return Optional.empty();
 	}
 
 	public List<Invitation> getInvitations(final int userId) {
-		final String sqlQuery = "from Invitation where userid=:userid";
+		final String sqlQuery = "from Invitation where userId.id=:userid or friendId.id=:userid";
 		return entityManager.createQuery(sqlQuery, Invitation.class).setParameter("userid", userId).getResultList();
 	}
 

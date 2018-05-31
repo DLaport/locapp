@@ -55,9 +55,9 @@ public class InvitationController {
 
 	@PUT
 	@Path("/invitation/{invitationId}")
-	public Friend acceptInvitation(@PathParam("invitationId") final String invitationId) {
+	public Friend acceptInvitation(@PathParam("id") final String id, @PathParam("invitationId") final String invitationId) {
 		try (FriendDao friendDao = new FriendDao();) {
-			final Friend friend = friendDao.addFriend(Integer.valueOf(invitationId));
+			final Friend friend = friendDao.addFriend(Integer.valueOf(invitationId), Integer.valueOf(id)).orElseThrow(BadRequestException::new);
 			deleteInvitation(invitationId);
 			return friend;
 		}
