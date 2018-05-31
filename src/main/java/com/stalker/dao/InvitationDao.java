@@ -1,6 +1,7 @@
 package com.stalker.dao;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -30,6 +31,11 @@ implements Closeable {
 			return Optional.of(invitation);
 		}
 		return Optional.empty();
+	}
+
+	public List<Invitation> getInvitations(final int userId) {
+		final String sqlQuery = "from Invitation where userid=:userid";
+		return entityManager.createQuery(sqlQuery, Invitation.class).setParameter("userid", userId).getResultList();
 	}
 
 	public void deleteInvitation(final String invitationId) {

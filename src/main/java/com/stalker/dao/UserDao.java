@@ -33,6 +33,7 @@ implements Closeable {
 	}
 
 	public List<User> searchUsers(final String search) {
+		// TODO: search only users that are not already in the friends list
 		final String sqlQuery = "from User where lower(username) like lower(:search)";
 		final List<User> users = entityManager.createQuery(sqlQuery, User.class).setParameter("search", "%" + search + "%").getResultList();
 		return users;
