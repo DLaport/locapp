@@ -1,22 +1,15 @@
 package com.stalker.dao;
 
-import java.io.Closeable;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import com.stalker.dao.model.Invitation;
 import com.stalker.dao.model.User;
 
 public class InvitationDao
-implements Closeable {
-	private final EntityManager entityManager;
-
-	public InvitationDao() {
-		entityManager = EntityManagerUtil.getEntityManager();
-	}
+extends Dao {
 
 	public Optional<Invitation> createInvitation(final int userId, final int friendId) {
 		if ((userId != friendId)) {
@@ -50,10 +43,5 @@ implements Closeable {
 	public void deleteInvitation(final String invitationId) {
 		final Invitation invitation = entityManager.find(Invitation.class, Integer.valueOf(invitationId));
 		EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.remove(invitation));
-	}
-
-	@Override
-	public void close() {
-		entityManager.close();
 	}
 }

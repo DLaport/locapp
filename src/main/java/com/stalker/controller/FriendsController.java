@@ -9,7 +9,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import com.stalker.dao.FriendDao;
 import com.stalker.dao.model.Friend;
@@ -30,12 +29,15 @@ public class FriendsController {
 	@GET
 	@Path("/{friendId}")
 	public Friend getFriend(@PathParam("id") final String userId, @PathParam("friendId") final String friendId) {
+		// TODO: check if we need this
 		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
 	@DELETE
 	@Path("/{friendId}")
-	public Response deleteFriend(@PathParam("id") final String userId, @PathParam("friendId") final String friendId) {
-		throw new UnsupportedOperationException("Not yet implemented.");
+	public void deleteFriend(@PathParam("id") final String userId, @PathParam("friendId") final String friendId) {
+		try (FriendDao friendDao = new FriendDao();) {
+			friendDao.deleteFriend(Integer.valueOf(userId), Integer.valueOf(friendId));
+		}
 	}
 }

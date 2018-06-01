@@ -1,22 +1,15 @@
 package com.stalker.dao;
 
-import java.io.Closeable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
 import javax.security.auth.login.CredentialException;
 
 import com.stalker.dao.model.User;
 
 public class UserDao
-implements Closeable {
-	private final EntityManager entityManager;
-
-	public UserDao() {
-		entityManager = EntityManagerUtil.getEntityManager();
-	}
+extends Dao {
 
 	public void createUser(final User user) {
 		EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(user));
@@ -58,10 +51,5 @@ implements Closeable {
 			user.setToken(null);
 			EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.merge(user));
 		});
-	}
-
-	@Override
-	public void close() {
-		entityManager.close();
 	}
 }

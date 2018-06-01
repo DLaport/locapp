@@ -1,23 +1,15 @@
 package com.stalker.dao;
 
-import java.io.Closeable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
 
 import com.stalker.dao.model.Friend;
 import com.stalker.dao.model.Invitation;
 import com.stalker.dao.model.User;
 
 public class FriendDao
-implements Closeable {
-	private final EntityManager entityManager;
-
-	public FriendDao() {
-		entityManager = EntityManagerUtil.getEntityManager();
-	}
+extends Dao {
 
 	public Optional<Friend> addFriend(final int invitationId, final int requesterId) {
 		final Invitation invitation = entityManager.find(Invitation.class, invitationId);
@@ -39,9 +31,11 @@ implements Closeable {
 			.collect(Collectors.toList());
 	}
 
-	@Override
-	public void close() {
-		entityManager.close();
+	public void deleteFriend(final int userId, final int friendId) {
+		final String sqlQuery = "from Friend where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
+		entityManager.createQuery(sqlQuery, Friend.class).setParameter("userid", userId).setParameter("friendid", friendId)
+			.getResultStream().findAny().ifPresent(friendRelation -> {
+				EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.remove(friendRelation));
+			});
 	}
-
 }

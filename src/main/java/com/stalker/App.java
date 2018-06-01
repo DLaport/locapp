@@ -14,6 +14,7 @@ import com.stalker.controller.FriendsController;
 import com.stalker.controller.InvitationController;
 import com.stalker.controller.PositionController;
 import com.stalker.controller.UserController;
+import com.stalker.exception.StandardExceptionMapper;
 
 public class App {
 	private static final URI BASE_URI = URI.create("http://localhost:8080/");
@@ -23,7 +24,8 @@ public class App {
 		UserController.class,
 		FriendsController.class,
 		PositionController.class,
-		InvitationController.class
+		InvitationController.class,
+		StandardExceptionMapper.class
 	};
 
 	public static void main(final String[] args) {
