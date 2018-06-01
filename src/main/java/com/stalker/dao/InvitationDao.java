@@ -24,17 +24,19 @@ implements Closeable {
 			invitation.setUserId(entityManager.find(User.class, userId));
 			invitation.setFriendId(entityManager.find(User.class, friendId));
 
-			// Check if they are already friends.
-			final String sql1 = "from Friend where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
-			final Query checkFriendsQuery = entityManager.createQuery(sql1).setParameter("userid", userId).setParameter("friendid", friendId);
-			// Check if they already invited each other.
-			final String sql2 = "from Invitation where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
-			final Query checkInvitationsQuery = entityManager.createQuery(sql2).setParameter("userid", userId).setParameter("friendid", friendId);
+			if ((invitation.getUserId() != null) && (invitation.getFriendId() != null)) {
+				// Check if they are already friends.
+				final String sql1 = "from Friend where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
+				final Query checkFriendsQuery = entityManager.createQuery(sql1).setParameter("userid", userId).setParameter("friendid", friendId);
+				// Check if they already invited each other.
+				final String sql2 = "from Invitation where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
+				final Query checkInvitationsQuery = entityManager.createQuery(sql2).setParameter("userid", userId).setParameter("friendid", friendId);
 
-			if ((checkFriendsQuery.getResultList().size() == 0) && (checkInvitationsQuery.getResultList().size() == 0)) {
-				// Only one row is added, because the "invitation" relation is always reciprocal.
-				EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(invitation));
-				return Optional.of(invitation);
+				if ((checkFriendsQuery.getResultList().size() == 0) && (checkInvitationsQuery.getResultList().size() == 0)) {
+					// Only one row is added, because the "invitation" relation is always reciprocal.
+					EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(invitation));
+					return Optional.of(invitation);
+				}
 			}
 		}
 		return Optional.empty();

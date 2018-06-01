@@ -11,7 +11,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.stalker.dao.FriendDao;
 import com.stalker.dao.model.Friend;
+import com.stalker.dao.model.User;
 
 @Secured
 @Path("/user/{id}/friends")
@@ -19,8 +21,10 @@ import com.stalker.dao.model.Friend;
 @Produces(MediaType.APPLICATION_JSON)
 public class FriendsController {
 	@GET
-	public List<Friend> getFriends(@PathParam("id") final String userId) {
-		throw new UnsupportedOperationException("Not yet implemented.");
+	public List<User> getFriends(@PathParam("id") final String userId) {
+		try (FriendDao friendDao = new FriendDao();) {
+			return friendDao.getFriends(Integer.valueOf(userId));
+		}
 	}
 
 	@GET
