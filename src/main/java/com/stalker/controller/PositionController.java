@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.stalker.dao.PositionDao;
 import com.stalker.dao.model.Position;
+import com.stalker.filter.Secured;
 
 @Secured
 @Path("/user/{id}/position")

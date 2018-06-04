@@ -16,6 +16,7 @@ import javax.ws.rs.core.UriInfo;
 
 import com.stalker.dao.UserDao;
 import com.stalker.dao.model.User;
+import com.stalker.filter.Secured;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)

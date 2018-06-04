@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import com.stalker.dao.FriendDao;
 import com.stalker.dao.model.Friend;
 import com.stalker.dao.model.User;
+import com.stalker.filter.Secured;
 
 @Secured
 @Path("/user/{id}/friends")

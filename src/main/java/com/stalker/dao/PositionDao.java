@@ -8,6 +8,6 @@ extends Dao {
 
 	public Position updatePosition(final String userId, final Position position) {
 		position.setUser(entityManager.find(User.class, Integer.valueOf(userId)));
-		return EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.merge(position));
+		return executeInTransaction(() -> entityManager.merge(position));
 	}
 }

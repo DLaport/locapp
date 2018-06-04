@@ -27,7 +27,7 @@ extends Dao {
 
 				if ((checkFriendsQuery.getResultList().size() == 0) && (checkInvitationsQuery.getResultList().size() == 0)) {
 					// Only one row is added, because the "invitation" relation is always reciprocal.
-					EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(invitation));
+					executeInTransaction(() -> entityManager.persist(invitation));
 					return Optional.of(invitation);
 				}
 			}
@@ -42,6 +42,6 @@ extends Dao {
 
 	public void deleteInvitation(final String invitationId) {
 		final Invitation invitation = entityManager.find(Invitation.class, Integer.valueOf(invitationId));
-		EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.remove(invitation));
+		executeInTransaction(() -> entityManager.remove(invitation));
 	}
 }

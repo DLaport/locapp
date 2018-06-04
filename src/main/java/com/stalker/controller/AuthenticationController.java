@@ -12,6 +12,8 @@ import javax.ws.rs.core.Response;
 
 import com.stalker.dao.UserDao;
 import com.stalker.dao.model.User;
+import com.stalker.filter.AuthenticationFilter;
+import com.stalker.filter.Secured;
 
 @Path("/authentication")
 @Consumes(MediaType.APPLICATION_JSON)

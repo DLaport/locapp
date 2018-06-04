@@ -18,7 +18,7 @@ extends Dao {
 			friend.setUserId(invitation.getUserId());
 			friend.setFriendId(invitation.getFriendId());
 			// Only one row is added, because the "friends" relation is always reciprocal.
-			EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(friend));
+			executeInTransaction(() -> entityManager.persist(friend));
 			return Optional.of(friend);
 		}
 		return Optional.empty();
@@ -35,7 +35,7 @@ extends Dao {
 		final String sqlQuery = "from Friend where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";
 		entityManager.createQuery(sqlQuery, Friend.class).setParameter("userid", userId).setParameter("friendid", friendId)
 			.getResultStream().findAny().ifPresent(friendRelation -> {
-				EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.remove(friendRelation));
+				executeInTransaction(() -> entityManager.remove(friendRelation));
 			});
 	}
 }

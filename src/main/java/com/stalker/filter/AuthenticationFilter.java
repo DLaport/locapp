@@ -1,4 +1,4 @@
-package com.stalker.controller;
+package com.stalker.filter;
 
 import java.security.Principal;
 

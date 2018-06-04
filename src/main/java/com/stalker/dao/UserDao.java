@@ -12,7 +12,7 @@ public class UserDao
 extends Dao {
 
 	public void createUser(final User user) {
-		EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.persist(user));
+		executeInTransaction(() -> entityManager.persist(user));
 	}
 
 	public Optional<User> getUserById(final int id) {
@@ -41,7 +41,7 @@ extends Dao {
 			.getResultStream().findAny()
 			.map(user -> {
 				user.setToken(UUID.randomUUID().toString());
-				EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.merge(user));
+				executeInTransaction(() -> entityManager.merge(user));
 				return user.getToken();
 			}).orElseThrow(CredentialException::new);
 	}
@@ -49,7 +49,7 @@ extends Dao {
 	public void disconnectUser(final String token) {
 		getUserByToken(token).ifPresent(user -> {
 			user.setToken(null);
-			EntityManagerUtil.executeInTransaction(entityManager, () -> entityManager.merge(user));
+			executeInTransaction(() -> entityManager.merge(user));
 		});
 	}
 }

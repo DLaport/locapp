@@ -25,6 +25,7 @@ import com.stalker.dao.FriendDao;
 import com.stalker.dao.InvitationDao;
 import com.stalker.dao.model.Friend;
 import com.stalker.dao.model.Invitation;
+import com.stalker.filter.Secured;
 
 @Secured
 @Path("/user/{id}")

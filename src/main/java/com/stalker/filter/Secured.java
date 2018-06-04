@@ -1,4 +1,4 @@
-package com.stalker.controller;
+package com.stalker.filter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
