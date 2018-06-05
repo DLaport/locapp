@@ -11,7 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.stalker.dao.FriendDao;
-import com.stalker.dao.model.Friend;
 import com.stalker.dao.model.User;
 import com.stalker.filter.Secured;
 
@@ -25,13 +24,6 @@ public class FriendsController {
 		try (FriendDao friendDao = new FriendDao();) {
 			return friendDao.getFriends(Integer.valueOf(userId));
 		}
-	}
-
-	@GET
-	@Path("/{friendId}")
-	public Friend getFriend(@PathParam("id") final String userId, @PathParam("friendId") final String friendId) {
-		// TODO: check if we need this
-		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
 	@DELETE

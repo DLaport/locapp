@@ -25,13 +25,8 @@ implements ContainerRequestFilter {
 	public void filter(final ContainerRequestContext requestContext) {
 		final String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-		// Validate the authorization header
-		if ((authorizationHeader == null) || !authorizationHeader.toLowerCase().startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ")) {
-			throw new NotAuthorizedException("Invalid authorization header.", AUTHENTICATION_SCHEME);
-		}
-
-		// Extract the token
-		final String token = authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
+		// If the header is valid, get the token. Otherwise, throw an Exception.
+		final String token = validateHeader(authorizationHeader);
 
 		// If the token is valid, get the user. Otherwise, throw an Exception.
 		final User user = validateToken(token);
@@ -39,16 +34,20 @@ implements ContainerRequestFilter {
 		updateSecurityContext(requestContext, user);
 	}
 
-	private User validateToken(final String token)
-	throws NotAuthorizedException {
+	private String validateHeader(final String authorizationHeader) {
+		if ((authorizationHeader == null) || !authorizationHeader.toLowerCase().startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ")) {
+			throw new NotAuthorizedException("Invalid authorization header.", AUTHENTICATION_SCHEME);
+		}
+		return authorizationHeader.substring(AUTHENTICATION_SCHEME.length()).trim();
+	}
+
+	private User validateToken(final String token) {
 		try (final UserDao userDao = new UserDao();) {
-			return userDao.getUserByToken(token).orElseThrow(() -> {
-				return new NotAuthorizedException("Invalid token.", AUTHENTICATION_SCHEME);
-			});
+			return userDao.getUserByToken(token)
+				.orElseThrow(() -> new NotAuthorizedException("Invalid token.", AUTHENTICATION_SCHEME));
 		}
 	}
 
-	// TODO: check if we really need this
 	private void updateSecurityContext(final ContainerRequestContext requestContext, final User user) {
 		final SecurityContext securityContext = requestContext.getSecurityContext();
 		requestContext.setSecurityContext(new SecurityContext() {

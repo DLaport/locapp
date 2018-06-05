@@ -12,6 +12,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import com.stalker.dao.UserDao;
@@ -36,9 +37,9 @@ public class UserController {
 	@GET
 	@Secured
 	@Path("/users")
-	public List<User> getUsers(@QueryParam("search") final String searchText) {
+	public List<User> getUsers(@QueryParam("search") final String searchText, @Context final SecurityContext securityContext) {
 		try (UserDao userDao = new UserDao();) {
-			return userDao.searchUsers(searchText);
+			return userDao.searchUsers(securityContext.getUserPrincipal().getName(), searchText);
 		}
 	}
 }

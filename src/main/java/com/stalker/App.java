@@ -13,13 +13,13 @@ import com.stalker.controller.FriendsController;
 import com.stalker.controller.InvitationController;
 import com.stalker.controller.PositionController;
 import com.stalker.controller.UserController;
-import com.stalker.exception.StandardExceptionMapper;
+import com.stalker.exception.GenericExceptionMapper;
 import com.stalker.filter.AuthenticationFilter;
 
 public class App {
 	private static final URI BASE_URI = URI.create("http://localhost:8080/");
 	private static final Class<?>[] resources = {
-		StandardExceptionMapper.class,
+		GenericExceptionMapper.class,
 		AuthenticationFilter.class,
 		AuthenticationController.class,
 		UserController.class,

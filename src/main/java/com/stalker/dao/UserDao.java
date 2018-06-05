@@ -25,10 +25,13 @@ extends Dao {
 		return entityManager.createQuery(sqlQuery, User.class).setParameter("token", token).getResultStream().findAny();
 	}
 
-	public List<User> searchUsers(final String search) {
-		// TODO: search only users that are not already in the friends list
-		final String sqlQuery = "from User where lower(username) like lower(:search)";
-		final List<User> users = entityManager.createQuery(sqlQuery, User.class).setParameter("search", "%" + search + "%").getResultList();
+	public List<User> searchUsers(final String username, final String search) {
+		// Search only users that are not already in the friends list.
+		final String sqlQuery = "from User where lower(username) like lower(:search)" //
+		+ " and username!=:username" // remove the requester
+		+ " and id not in (select userId.id from Friend where friendId.username=:username)" // remove friends
+		+ " and id not in (select friendId.id from Friend where userId.username=:username)";
+		final List<User> users = entityManager.createQuery(sqlQuery, User.class).setParameter("username", username).setParameter("search", "%" + search + "%").getResultList();
 		return users;
 	}
 
