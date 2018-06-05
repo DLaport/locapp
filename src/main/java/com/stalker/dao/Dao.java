@@ -4,16 +4,26 @@ import java.io.Closeable;
 import java.util.function.Supplier;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 public abstract class Dao
 implements Closeable {
 	private static final String PERSISTENCE_UNIT_NAME = "postgres";
+	private static final EntityManagerFactory entityManagerFactory;
 	final EntityManager entityManager;
+
+	static {
+		try {
+			entityManagerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public Dao() {
 		try {
-			entityManager = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME).createEntityManager();
+			entityManager = Dao.entityManagerFactory.createEntityManager();
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
