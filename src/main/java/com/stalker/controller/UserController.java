@@ -1,6 +1,7 @@
 package com.stalker.controller;
 
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -31,6 +32,8 @@ public class UserController {
 			userDao.createUser(user);
 			final URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(user.getId())).build();
 			return Response.created(uri).entity(user).build();
+		} catch (final NoSuchAlgorithmException e) {
+			return Response.serverError().build();
 		}
 	}
 

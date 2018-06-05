@@ -1,5 +1,7 @@
 package com.stalker.dao;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,7 +13,13 @@ import com.stalker.dao.model.User;
 public class UserDao
 extends Dao {
 
-	public void createUser(final User user) {
+	public void createUser(final User user)
+	throws NoSuchAlgorithmException {
+		// Hash the password
+		final String currentPassword = user.getPassword();
+		final MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+		final String digest = new String(messageDigest.digest(currentPassword.getBytes()));
+		user.setPassword(digest);
 		executeInTransaction(() -> entityManager.persist(user));
 	}
 
@@ -36,11 +44,15 @@ extends Dao {
 	}
 
 	public String authenticateUser(final String username, final String password)
-	throws CredentialException {
+	throws CredentialException, NoSuchAlgorithmException {
+		// Hash the password
+		final MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+		final String digest = new String(messageDigest.digest(password.getBytes()));
+
 		final String sqlQuery = "from User where username=:username and password=:password";
 		return entityManager.createQuery(sqlQuery, User.class)
 			.setParameter("username", username)
-			.setParameter("password", password)
+			.setParameter("password", digest)
 			.getResultStream().findAny()
 			.map(user -> {
 				user.setToken(UUID.randomUUID().toString());

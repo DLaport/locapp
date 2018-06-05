@@ -1,5 +1,7 @@
 package com.stalker.controller;
 
+import java.security.NoSuchAlgorithmException;
+
 import javax.security.auth.login.CredentialException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -29,6 +31,8 @@ public class AuthenticationController {
 			}
 		} catch (final CredentialException e) {
 			return Response.status(Response.Status.FORBIDDEN).build();
+		} catch (final NoSuchAlgorithmException e) {
+			return Response.serverError().build();
 		}
 	}
 

@@ -13,6 +13,10 @@ implements ExceptionMapper<Throwable> {
 	public Response toResponse(final Throwable throwable) {
 		if (throwable instanceof WebApplicationException) {
 			return ((WebApplicationException) throwable).getResponse();
+		} else if (throwable instanceof IllegalArgumentException) {
+			if (throwable.getMessage().equals("unauthorized")) {
+				return Response.status(Response.Status.UNAUTHORIZED).build();
+			}
 		}
 		throwable.printStackTrace();
 		return Response.serverError().build();

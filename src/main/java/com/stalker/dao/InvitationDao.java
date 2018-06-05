@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.Query;
+import javax.ws.rs.core.SecurityContext;
 
 import com.stalker.dao.model.Invitation;
 import com.stalker.dao.model.User;
@@ -11,7 +12,15 @@ import com.stalker.dao.model.User;
 public class InvitationDao
 extends Dao {
 
+	public InvitationDao() {
+	}
+
+	public InvitationDao(final SecurityContext securityContext) {
+		super(securityContext);
+	}
+
 	public Optional<Invitation> createInvitation(final int userId, final int friendId) {
+		validateUser(userId);
 		if ((userId != friendId)) {
 			final Invitation invitation = new Invitation();
 			invitation.setUserId(entityManager.find(User.class, userId));
@@ -36,11 +45,13 @@ extends Dao {
 	}
 
 	public List<Invitation> getInvitations(final int userId) {
+		validateUser(userId);
 		final String sqlQuery = "from Invitation where userId.id=:userid or friendId.id=:userid";
 		return entityManager.createQuery(sqlQuery, Invitation.class).setParameter("userid", userId).getResultList();
 	}
 
-	public void deleteInvitation(final String invitationId) {
+	public void deleteInvitation(final int userId, final String invitationId) {
+		validateUser(userId);
 		final Invitation invitation = entityManager.find(Invitation.class, Integer.valueOf(invitationId));
 		executeInTransaction(() -> entityManager.remove(invitation));
 	}

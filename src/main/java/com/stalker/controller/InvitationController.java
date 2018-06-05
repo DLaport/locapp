@@ -17,6 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,12 +33,14 @@ import com.stalker.filter.Secured;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class InvitationController {
+	@Context
+	SecurityContext securityContext;
 
 	@POST
 	@Path("/invitation")
 	public Response sendInvitation(@PathParam("id") final String userId, @Context final UriInfo uriInfo, final String json) {
 		final String friendId = getAttribute(json, "friendId").orElse("-1");
-		try (InvitationDao invitationDao = new InvitationDao()) {
+		try (InvitationDao invitationDao = new InvitationDao(securityContext)) {
 			return invitationDao.createInvitation(Integer.valueOf(userId), Integer.valueOf(friendId))
 				.map(invitation -> {
 					final URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(invitation.getId())).build();
@@ -49,7 +52,7 @@ public class InvitationController {
 	@GET
 	@Path("/invitations")
 	public List<Invitation> getInvitations(@PathParam("id") final String userId) {
-		try (InvitationDao invitationDao = new InvitationDao();) {
+		try (InvitationDao invitationDao = new InvitationDao(securityContext);) {
 			return invitationDao.getInvitations(Integer.valueOf(userId));
 		}
 	}
@@ -57,18 +60,18 @@ public class InvitationController {
 	@PUT
 	@Path("/invitation/{invitationId}")
 	public Friend acceptInvitation(@PathParam("id") final String id, @PathParam("invitationId") final String invitationId) {
-		try (FriendDao friendDao = new FriendDao();) {
+		try (FriendDao friendDao = new FriendDao(securityContext);) {
 			final Friend friend = friendDao.addFriend(Integer.valueOf(invitationId), Integer.valueOf(id)).orElseThrow(BadRequestException::new);
-			deleteInvitation(invitationId);
+			deleteInvitation(id, invitationId);
 			return friend;
 		}
 	}
 
 	@DELETE
 	@Path("/invitation/{invitationId}")
-	public void deleteInvitation(@PathParam("invitationId") final String invitationId) {
-		try (InvitationDao invitationDao = new InvitationDao()) {
-			invitationDao.deleteInvitation(invitationId);
+	public void deleteInvitation(@PathParam("id") final String id, @PathParam("invitationId") final String invitationId) {
+		try (InvitationDao invitationDao = new InvitationDao(securityContext)) {
+			invitationDao.deleteInvitation(Integer.valueOf(id), invitationId);
 		}
 	}
 
