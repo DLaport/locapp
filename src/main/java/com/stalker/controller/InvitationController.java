@@ -1,9 +1,8 @@
 package com.stalker.controller;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -20,12 +19,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.stalker.dao.FriendDao;
 import com.stalker.dao.InvitationDao;
 import com.stalker.dao.model.Friend;
 import com.stalker.dao.model.Invitation;
+import com.stalker.dto.FriendDto;
+import com.stalker.dto.InvitationDto;
 import com.stalker.filter.Secured;
 
 @Secured
@@ -38,32 +37,33 @@ public class InvitationController {
 
 	@POST
 	@Path("/invitation")
-	public Response sendInvitation(@PathParam("id") final String userId, @Context final UriInfo uriInfo, final String json) {
-		final String friendId = getAttribute(json, "friendId").orElse("-1");
+	public Response sendInvitation(@PathParam("id") final String userId, @Context final UriInfo uriInfo, final InvitationDto invitationDto) {
 		try (InvitationDao invitationDao = new InvitationDao(securityContext)) {
-			return invitationDao.createInvitation(Integer.valueOf(userId), Integer.valueOf(friendId))
-				.map(invitation -> {
-					final URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(invitation.getId())).build();
-					return Response.created(uri).entity(invitation).build();
+			final Invitation invitation = invitationDto.toDao();
+			return invitationDao.createInvitation(Integer.valueOf(userId), Integer.valueOf(invitation.getFriendId().getId()))
+				.map(invite -> {
+					final URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(invite.getId())).build();
+					return Response.created(uri).entity(invite.toDto()).build();
 				}).orElseGet(() -> Response.status(Response.Status.BAD_REQUEST).build());
 		}
 	}
 
 	@GET
 	@Path("/invitations")
-	public List<Invitation> getInvitations(@PathParam("id") final String userId) {
+	public List<InvitationDto> getInvitations(@PathParam("id") final String userId) {
 		try (InvitationDao invitationDao = new InvitationDao(securityContext);) {
-			return invitationDao.getInvitations(Integer.valueOf(userId));
+			return invitationDao.getInvitations(Integer.valueOf(userId))
+				.stream().map(Invitation::toDto).collect(Collectors.toList());
 		}
 	}
 
 	@PUT
 	@Path("/invitation/{invitationId}")
-	public Friend acceptInvitation(@PathParam("id") final String id, @PathParam("invitationId") final String invitationId) {
+	public FriendDto acceptInvitation(@PathParam("id") final String id, @PathParam("invitationId") final String invitationId) {
 		try (FriendDao friendDao = new FriendDao(securityContext);) {
 			final Friend friend = friendDao.addFriend(Integer.valueOf(invitationId), Integer.valueOf(id)).orElseThrow(BadRequestException::new);
 			deleteInvitation(id, invitationId);
-			return friend;
+			return friend.toDto();
 		}
 	}
 
@@ -72,15 +72,6 @@ public class InvitationController {
 	public void deleteInvitation(@PathParam("id") final String id, @PathParam("invitationId") final String invitationId) {
 		try (InvitationDao invitationDao = new InvitationDao(securityContext)) {
 			invitationDao.deleteInvitation(Integer.valueOf(id), invitationId);
-		}
-	}
-
-	private Optional<String> getAttribute(final String json, final String attribute) {
-		try {
-			final ObjectNode node = new ObjectMapper().readValue(json, ObjectNode.class);
-			return node.has(attribute) ? Optional.of(node.get(attribute).asText()) : Optional.empty();
-		} catch (final IOException e) {
-			throw new BadRequestException(e);
 		}
 	}
 }

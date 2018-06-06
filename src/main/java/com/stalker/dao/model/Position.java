@@ -16,6 +16,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.stalker.dto.PositionDto;
+
 @Entity
 @Table(name = "POSITION")
 public class Position {
@@ -73,5 +75,9 @@ public class Position {
 
 	public void setLastUpdate(final Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+
+	public PositionDto toDto() {
+		return new PositionDto(id, user.getId(), latitude, longitude, lastUpdate);
 	}
 }

@@ -3,6 +3,7 @@ package com.stalker.controller;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -18,6 +19,7 @@ import javax.ws.rs.core.UriInfo;
 
 import com.stalker.dao.UserDao;
 import com.stalker.dao.model.User;
+import com.stalker.dto.UserDto;
 import com.stalker.filter.Secured;
 
 @Path("/")
@@ -27,11 +29,11 @@ public class UserController {
 
 	@POST
 	@Path("/user")
-	public Response createUser(final User user, @Context final UriInfo uriInfo) {
+	public Response createUser(final UserDto userDto, @Context final UriInfo uriInfo) {
 		try (UserDao userDao = new UserDao();) {
-			userDao.createUser(user);
+			final User user = userDao.createUser(userDto.toDao());
 			final URI uri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(user.getId())).build();
-			return Response.created(uri).entity(user).build();
+			return Response.created(uri).entity(user.toDto()).build();
 		} catch (final NoSuchAlgorithmException e) {
 			return Response.serverError().build();
 		}
@@ -40,9 +42,10 @@ public class UserController {
 	@GET
 	@Secured
 	@Path("/users")
-	public List<User> getUsers(@QueryParam("search") final String searchText, @Context final SecurityContext securityContext) {
+	public List<UserDto> getUsers(@QueryParam("search") final String searchText, @Context final SecurityContext securityContext) {
 		try (UserDao userDao = new UserDao();) {
-			return userDao.searchUsers(securityContext.getUserPrincipal().getName(), searchText);
+			return userDao.searchUsers(securityContext.getUserPrincipal().getName(), searchText)
+				.stream().map(User::toDto).collect(Collectors.toList());
 		}
 	}
 }

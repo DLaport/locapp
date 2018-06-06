@@ -13,7 +13,7 @@ import com.stalker.dao.model.User;
 public class UserDao
 extends Dao {
 
-	public void createUser(final User user)
+	public User createUser(final User user)
 	throws NoSuchAlgorithmException {
 		// Hash the password
 		final String currentPassword = user.getPassword();
@@ -21,6 +21,7 @@ extends Dao {
 		final String digest = new String(messageDigest.digest(currentPassword.getBytes()));
 		user.setPassword(digest);
 		executeInTransaction(() -> entityManager.persist(user));
+		return user;
 	}
 
 	public Optional<User> getUserById(final int id) {

@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import com.stalker.dao.UserDao;
 import com.stalker.dao.model.User;
+import com.stalker.dto.UserDto;
 import com.stalker.filter.AuthenticationFilter;
 import com.stalker.filter.Secured;
 
@@ -23,11 +24,14 @@ import com.stalker.filter.Secured;
 public class AuthenticationController {
 
 	@POST
-	public Response authenticateUser(final User credentials) {
+	public Response authenticateUser(final UserDto credentialsDto) {
 		try {
 			try (final UserDao dao = new UserDao();) {
-				final String token = dao.authenticateUser(credentials.getUsername(), credentials.getPassword());
-				return Response.ok(token).build();
+				final User credentials = credentialsDto.toDao();
+				final String newToken = dao.authenticateUser(credentials.getUsername(), credentials.getPassword());
+				return Response.ok(new Object() {
+					private final String token = newToken; // TODO check this
+				}).build();
 			}
 		} catch (final CredentialException e) {
 			return Response.status(Response.Status.FORBIDDEN).build();

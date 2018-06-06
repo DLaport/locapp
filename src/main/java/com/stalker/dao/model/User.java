@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.stalker.dto.UserDto;
+
 @Entity
 @Table(name = "LOCAPP_USER") // Note: "USER" is a reserved keyword
 public class User {
@@ -82,5 +84,9 @@ public class User {
 
 	public void setToken(final String token) {
 		this.token = token;
+	}
+
+	public UserDto toDto() {
+		return new UserDto(id, username, null, firstName, lastName, email, null);
 	}
 }

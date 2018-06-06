@@ -10,6 +10,8 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.stalker.dto.InvitationDto;
+
 @Entity
 @Table(name = "INVITATION", uniqueConstraints = @UniqueConstraint(columnNames = {
 	"USER_ID",
@@ -49,5 +51,9 @@ public class Invitation {
 
 	public void setFriendId(final User friendId) {
 		this.friendId = friendId;
+	}
+
+	public InvitationDto toDto() {
+		return new InvitationDto(id, userId.getId(), friendId.getId());
 	}
 }

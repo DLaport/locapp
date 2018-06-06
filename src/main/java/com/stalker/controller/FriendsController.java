@@ -1,6 +1,7 @@
 package com.stalker.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -14,6 +15,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import com.stalker.dao.FriendDao;
 import com.stalker.dao.model.User;
+import com.stalker.dto.UserDto;
 import com.stalker.filter.Secured;
 
 @Secured
@@ -25,9 +27,10 @@ public class FriendsController {
 	SecurityContext securityContext;
 
 	@GET
-	public List<User> getFriends(@PathParam("id") final String userId) {
+	public List<UserDto> getFriends(@PathParam("id") final String userId) {
 		try (FriendDao friendDao = new FriendDao(securityContext);) {
-			return friendDao.getFriends(Integer.valueOf(userId));
+			return friendDao.getFriends(Integer.valueOf(userId))
+				.stream().map(User::toDto).collect(Collectors.toList());
 		}
 	}
 
