@@ -21,6 +21,11 @@ public class AuthenticationFilter
 implements ContainerRequestFilter {
 	public static final String AUTHENTICATION_SCHEME = "Bearer";
 
+	/**
+	 * Checks if the Authorization Header of the request containes a valid token.
+	 * When the header is invalid (i.e, no token given / token not found in db) the request is aborted
+	 * and a Response is sent back to the client with the status code 401 (Unauthorized).
+	 */
 	@Override
 	public void filter(final ContainerRequestContext requestContext) {
 		final String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
@@ -31,6 +36,7 @@ implements ContainerRequestFilter {
 		// If the token is valid, get the user. Otherwise, throw an Exception.
 		final User user = validateToken(token);
 
+		// The username will be kept in the security context.
 		updateSecurityContext(requestContext, user);
 	}
 

@@ -19,6 +19,13 @@ extends Dao {
 		super(securityContext);
 	}
 
+	/**
+	 * Creates a new invitation (from the current user, to another one).
+	 *
+	 * @param userId Current user.
+	 * @param friendId Friend identifier.
+	 * @return the friend request, if both ids are different.
+	 */
 	public Optional<Invitation> createInvitation(final int userId, final int friendId) {
 		validateUser(userId);
 		if ((userId != friendId)) {
@@ -44,12 +51,24 @@ extends Dao {
 		return Optional.empty();
 	}
 
+	/**
+	 * Retrieves the pending invitations sent to the current user.
+	 *
+	 * @param userId Current user.
+	 * @return pending invitations.
+	 */
 	public List<Invitation> getInvitations(final int userId) {
 		validateUser(userId);
 		final String sqlQuery = "from Invitation where userId.id=:userid or friendId.id=:userid";
 		return entityManager.createQuery(sqlQuery, Invitation.class).setParameter("userid", userId).getResultList();
 	}
 
+	/**
+	 * Deletes the given invitation.
+	 *
+	 * @param userId Current user.
+	 * @param invitationId Invitation identifier.
+	 */
 	public void deleteInvitation(final int userId, final String invitationId) {
 		validateUser(userId);
 		final Invitation invitation = entityManager.find(Invitation.class, Integer.valueOf(invitationId));

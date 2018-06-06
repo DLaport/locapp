@@ -20,6 +20,13 @@ extends Dao {
 		super(securityContext);
 	}
 
+	/**
+	 * Creates a friend relation between two users, once the invitation has been accepted by the receiver.
+	 *
+	 * @param invitationId Identifier of the invitation.
+	 * @param userId Identifier of the current user.
+	 * @return the Friend relation, if the invitation id is valid.
+	 */
 	public Optional<Friend> addFriend(final int invitationId, final int userId) {
 		validateUser(userId);
 		final Invitation invitation = entityManager.find(Invitation.class, invitationId);
@@ -34,6 +41,12 @@ extends Dao {
 		return Optional.empty();
 	}
 
+	/**
+	 * Retrieves the friends of the user.
+	 *
+	 * @param userId Current user.
+	 * @return all the friends of this user.
+	 */
 	public List<User> getFriends(final int userId) {
 		validateUser(userId);
 		final String sqlQuery = "from Friend where userId.id=:userid or friendId.id=:userid";
@@ -42,6 +55,12 @@ extends Dao {
 			.collect(Collectors.toList());
 	}
 
+	/**
+	 * Deletes a friend relation.
+	 *
+	 * @param userId Current user.
+	 * @param friendId Former friend. (rip)
+	 */
 	public void deleteFriend(final int userId, final int friendId) {
 		validateUser(userId);
 		final String sqlQuery = "from Friend where (userId.id=:userid and friendId.id=:friendid) or (userId.id=:friendid and friendId.id=:userid)";

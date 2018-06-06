@@ -7,6 +7,12 @@ import java.lang.annotation.Target;
 
 import javax.ws.rs.NameBinding;
 
+/**
+ * This annotation applies adds the {@link AuthenticationFilter} to the selected method or type.
+ * All requests going through the selected resource are checked and eventually aborted by the filter.
+ *
+ * @see AuthenticationFilter
+ */
 @NameBinding
 @Retention(RetentionPolicy.RUNTIME)
 @Target({

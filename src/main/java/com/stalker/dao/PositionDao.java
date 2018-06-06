@@ -19,6 +19,13 @@ extends Dao {
 		super(securityContext);
 	}
 
+	/**
+	 * Updates the position of the user.
+	 *
+	 * @param userId Current user.
+	 * @param position New position.
+	 * @return the saved position.
+	 */
 	public Position updatePosition(final int userId, final Position position) {
 		validateUser(userId);
 		position.setUser(entityManager.find(User.class, userId));
@@ -33,6 +40,12 @@ extends Dao {
 		return position;
 	}
 
+	/**
+	 * Retrieves the last known positions of all user's friends.
+	 *
+	 * @param userId Current user.
+	 * @return friends positions.
+	 */
 	public List<Position> getFriendsPositions(final int userId) {
 		validateUser(userId);
 		final String sqlQuery = "from Position where user.id=(select friendId.id from Friend where userId.id=:userid)" //

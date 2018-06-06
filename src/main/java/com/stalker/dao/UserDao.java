@@ -13,6 +13,13 @@ import com.stalker.dao.model.User;
 public class UserDao
 extends Dao {
 
+	/**
+	 * Creates a new User.
+	 *
+	 * @param user User to save.
+	 * @return the user.
+	 * @throws NoSuchAlgorithmException on password encryption failure.
+	 */
 	public User createUser(final User user)
 	throws NoSuchAlgorithmException {
 		// Hash the password
@@ -24,16 +31,35 @@ extends Dao {
 		return user;
 	}
 
+	/**
+	 * Gets user who has the given id.
+	 *
+	 * @param id user identifier.
+	 * @return the user, if found.
+	 */
 	public Optional<User> getUserById(final int id) {
 		final User user = entityManager.find(User.class, id);
 		return Optional.ofNullable(user);
 	}
 
+	/**
+	 * Gets the user connected with the given token.
+	 *
+	 * @param token UUID token.
+	 * @return the user, if found.
+	 */
 	public Optional<User> getUserByToken(final String token) {
 		final String sqlQuery = "from User where token=:token";
 		return entityManager.createQuery(sqlQuery, User.class).setParameter("token", token).getResultStream().findAny();
 	}
 
+	/**
+	 * Searches for a user whose name containes the given string (case is ignored).
+	 *
+	 * @param username Username of the current user.
+	 * @param search The string to search.
+	 * @return all matching users.
+	 */
 	public List<User> searchUsers(final String username, final String search) {
 		// Search only users that are not already in the friends list.
 		final String sqlQuery = "from User where lower(username) like lower(:search)" //
@@ -44,6 +70,15 @@ extends Dao {
 		return users;
 	}
 
+	/**
+	 * Authenticates the user, and throws an {@link CredentialException} on failure.
+	 *
+	 * @param username Username.
+	 * @param password Password.
+	 * @return the authenticated user.
+	 * @throws CredentialException when credentials are invalid.
+	 * @throws NoSuchAlgorithmException on password encryption failure.
+	 */
 	public User authenticateUser(final String username, final String password)
 	throws CredentialException, NoSuchAlgorithmException {
 		// Hash the password
@@ -62,6 +97,11 @@ extends Dao {
 			}).orElseThrow(CredentialException::new);
 	}
 
+	/**
+	 * Removes the current user's token from db.
+	 *
+	 * @param token User token.
+	 */
 	public void disconnectUser(final String token) {
 		getUserByToken(token).ifPresent(user -> {
 			user.setToken(null);
