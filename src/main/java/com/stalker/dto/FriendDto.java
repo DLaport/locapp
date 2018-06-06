@@ -22,11 +22,17 @@ public class FriendDto {
 	public Friend toDao() {
 		final Friend friendDao = new Friend();
 		final User user = new User();
-		user.setId(Integer.valueOf(userId));
+		if (userId != null) {
+			user.setId(Integer.valueOf(userId));
+		}
 		final User friend = new User();
-		friend.setId(Integer.valueOf(friendId));
+		if (friendId != null) {
+			friend.setId(Integer.valueOf(friendId));
+		}
 
-		friendDao.setId(Integer.valueOf(id));
+		if (id != null) {
+			friendDao.setId(Integer.valueOf(id));
+		}
 		friendDao.setUserId(user);
 		friendDao.setFriendId(friend);
 

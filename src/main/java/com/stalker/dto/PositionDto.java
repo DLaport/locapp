@@ -28,13 +28,23 @@ public class PositionDto {
 	public Position toDao() {
 		final Position position = new Position();
 		final User user = new User();
-		user.setId(Integer.valueOf(this.user));
+		if (this.user != null) {
+			user.setId(Integer.valueOf(this.user));
+		}
 
 		position.setUser(user);
-		position.setId(Integer.valueOf(id));
-		position.setLastUpdate(new Date(Long.valueOf(lastUpdate)));
-		position.setLatitude(Double.valueOf(latitude));
-		position.setLongitude(Double.valueOf(longitude));
+		if (id != null) {
+			position.setId(id != null ? Integer.valueOf(id) : null);
+		}
+		if (lastUpdate != null) {
+			position.setLastUpdate(new Date(Long.valueOf(lastUpdate)));
+		}
+		if (latitude != null) {
+			position.setLatitude(Double.valueOf(latitude));
+		}
+		if (longitude != null) {
+			position.setLongitude(Double.valueOf(longitude));
+		}
 		return position;
 	}
 

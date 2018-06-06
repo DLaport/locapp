@@ -31,6 +31,10 @@ public class AuthenticationController {
 				final String newToken = dao.authenticateUser(credentials.getUsername(), credentials.getPassword());
 				return Response.ok(new Object() {
 					private final String token = newToken; // TODO check this
+
+					public String getToken() {
+						return token;
+					}
 				}).build();
 			}
 		} catch (final CredentialException e) {

@@ -25,7 +25,9 @@ public class UserDto {
 
 	public User toDao() {
 		final User user = new User();
-		user.setId(Integer.valueOf(id));
+		if (id != null) {
+			user.setId(Integer.valueOf(id));
+		}
 		user.setUsername(username);
 		user.setPassword(password);
 		user.setFirstName(firstName);

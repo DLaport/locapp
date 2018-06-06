@@ -22,11 +22,17 @@ public class InvitationDto {
 	public Invitation toDao() {
 		final Invitation invitationDao = new Invitation();
 		final User user = new User();
-		user.setId(Integer.valueOf(userId));
+		if (userId != null) {
+			user.setId(Integer.valueOf(userId));
+		}
 		final User friend = new User();
-		friend.setId(Integer.valueOf(friendId));
+		if (friendId != null) {
+			friend.setId(Integer.valueOf(friendId));
+		}
 
-		invitationDao.setId(Integer.valueOf(id));
+		if (id != null) {
+			invitationDao.setId(Integer.valueOf(id));
+		}
 		invitationDao.setUserId(user);
 		invitationDao.setFriendId(friend);
 
