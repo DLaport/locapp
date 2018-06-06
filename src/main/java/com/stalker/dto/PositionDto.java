@@ -10,19 +10,25 @@ import com.stalker.dao.model.User;
 public class PositionDto {
 	private String id;
 	private String user;
+	private String username;
+	private String firstName;
+	private String lastName;
 	private String latitude;
 	private String longitude;
-	private String lastUpdate;
+	private Date lastUpdate;
 
 	public PositionDto() {
 	}
 
-	public PositionDto(final int id, final int user, final double latitude, final double longitude, final Date lastUpdate) {
+	public PositionDto(final int id, final User user, final double latitude, final double longitude, final Date lastUpdate) {
 		this.id = Integer.toString(id);
-		this.user = Integer.toString(user);
+		this.user = Integer.toString(user.getId());
+		username = user.getUsername();
+		firstName = user.getFirstName();
+		lastName = user.getLastName();
 		this.latitude = Double.toString(latitude);
 		this.longitude = Double.toString(longitude);
-		this.lastUpdate = Long.toString(lastUpdate.getTime());
+		this.lastUpdate = lastUpdate;
 	}
 
 	public Position toDao() {
@@ -37,7 +43,7 @@ public class PositionDto {
 			position.setId(id != null ? Integer.valueOf(id) : null);
 		}
 		if (lastUpdate != null) {
-			position.setLastUpdate(new Date(Long.valueOf(lastUpdate)));
+			position.setLastUpdate(lastUpdate);
 		}
 		if (latitude != null) {
 			position.setLatitude(Double.valueOf(latitude));
@@ -64,7 +70,19 @@ public class PositionDto {
 		return longitude;
 	}
 
-	public String getLastUpdate() {
+	public Date getLastUpdate() {
 		return lastUpdate;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
 	}
 }

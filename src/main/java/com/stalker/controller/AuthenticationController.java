@@ -28,14 +28,10 @@ public class AuthenticationController {
 		try {
 			try (final UserDao dao = new UserDao();) {
 				final User credentials = credentialsDto.toDao();
-				final String newToken = dao.authenticateUser(credentials.getUsername(), credentials.getPassword());
-				return Response.ok(new Object() {
-					private final String token = newToken; // TODO check this
-
-					public String getToken() {
-						return token;
-					}
-				}).build();
+				final User authentifiedUser = dao.authenticateUser(credentials.getUsername(), credentials.getPassword());
+				final UserDto userDto = authentifiedUser.toDto();
+				userDto.setToken(authentifiedUser.getToken());
+				return Response.ok(userDto).build();
 			}
 		} catch (final CredentialException e) {
 			return Response.status(Response.Status.FORBIDDEN).build();

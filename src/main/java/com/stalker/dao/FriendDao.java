@@ -23,7 +23,7 @@ extends Dao {
 	public Optional<Friend> addFriend(final int invitationId, final int userId) {
 		validateUser(userId);
 		final Invitation invitation = entityManager.find(Invitation.class, invitationId);
-		if (userId != invitation.getUserId().getId()) {
+		if (userId != invitation.getUserId().getId()) { // TODO fix this
 			final Friend friend = new Friend();
 			friend.setUserId(invitation.getUserId());
 			friend.setFriendId(invitation.getFriendId());

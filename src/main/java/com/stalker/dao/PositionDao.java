@@ -1,6 +1,8 @@
 package com.stalker.dao;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.core.SecurityContext;
 
@@ -20,7 +22,15 @@ extends Dao {
 	public Position updatePosition(final int userId, final Position position) {
 		validateUser(userId);
 		position.setUser(entityManager.find(User.class, userId));
-		return executeInTransaction(() -> entityManager.merge(position));
+		position.setLastUpdate(new Date());
+		final Optional<Position> somePosition = entityManager.createQuery("from Position where user.id=:userid", Position.class).setParameter("userid", userId).getResultStream().findFirst();
+		if (somePosition.isPresent()) { // Update
+			position.setId(somePosition.get().getId());
+			executeInTransaction(() -> entityManager.merge(position));
+		} else { //Create
+			executeInTransaction(() -> entityManager.persist(position));
+		}
+		return position;
 	}
 
 	public List<Position> getFriendsPositions(final int userId) {

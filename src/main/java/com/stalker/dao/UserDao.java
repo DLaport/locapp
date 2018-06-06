@@ -44,7 +44,7 @@ extends Dao {
 		return users;
 	}
 
-	public String authenticateUser(final String username, final String password)
+	public User authenticateUser(final String username, final String password)
 	throws CredentialException, NoSuchAlgorithmException {
 		// Hash the password
 		final MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -58,7 +58,7 @@ extends Dao {
 			.map(user -> {
 				user.setToken(UUID.randomUUID().toString());
 				executeInTransaction(() -> entityManager.merge(user));
-				return user.getToken();
+				return user;
 			}).orElseThrow(CredentialException::new);
 	}
 

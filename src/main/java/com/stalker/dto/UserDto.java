@@ -67,4 +67,8 @@ public class UserDto {
 	public String getToken() {
 		return token;
 	}
+
+	public void setToken(final String token) {
+		this.token = token;
+	}
 }

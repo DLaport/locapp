@@ -78,6 +78,6 @@ public class Position {
 	}
 
 	public PositionDto toDto() {
-		return new PositionDto(id, user.getId(), latitude, longitude, lastUpdate);
+		return new PositionDto(id, user, latitude, longitude, lastUpdate);
 	}
 }
